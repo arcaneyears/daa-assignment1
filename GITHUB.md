@@ -1,6 +1,6 @@
 # Submission links
 
-* GitHub repository: <PASTE YOUR REPO URL HERE>
+* GitHub repository: https://github.com/arcaneyears/daa-assignment1
 * Branch: `main`
 * Tag: `v1.0`
 
