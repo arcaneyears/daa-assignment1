@@ -26,6 +26,7 @@ public final class Metrics {
 
     private int currentDepth;
     private int maxDepth;
+    private long recursiveCalls;
 
     private long startNanos;
     private long elapsedNanos;
@@ -39,6 +40,7 @@ public final class Metrics {
         allocatedCells = 0;
         currentDepth = 0;
         maxDepth = 0;
+        recursiveCalls = 0;
         startNanos = 0;
         elapsedNanos = 0;
         running = false;
@@ -141,6 +143,7 @@ public final class Metrics {
      * running maximum, so {@link #maxDepth()} is the peak number of live frames.
      */
     public void enterRecursion() {
+        recursiveCalls++;
         currentDepth++;
         if (currentDepth > maxDepth) {
             maxDepth = currentDepth;
@@ -160,10 +163,20 @@ public final class Metrics {
         return maxDepth;
     }
 
+    /**
+     * Number of logical recursion levels entered. For an iterative (tail-call eliminated)
+     * algorithm such as {@link com.taubay.daa.algorithms.QuickSelect} this counts the
+     * partition rounds while {@link #maxDepth()} stays at 1, which is exactly the point:
+     * the work is logarithmic but the stack is constant.
+     */
+    public long recursiveCalls() {
+        return recursiveCalls;
+    }
+
     @Override
     public String toString() {
         return String.format(
-                "Metrics{time=%.3f ms, comparisons=%d, swaps=%d, allocations=%d (%d cells), maxDepth=%d}",
-                elapsedMillis(), comparisons, swaps, allocations, allocatedCells, maxDepth);
+                "Metrics{time=%.3f ms, comparisons=%d, swaps=%d, allocations=%d (%d cells), maxDepth=%d, calls=%d}",
+                elapsedMillis(), comparisons, swaps, allocations, allocatedCells, maxDepth, recursiveCalls);
     }
 }
