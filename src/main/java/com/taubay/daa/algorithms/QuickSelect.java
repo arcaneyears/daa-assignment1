@@ -4,28 +4,7 @@ import com.taubay.daa.metrics.Metrics;
 
 import java.util.Random;
 
-/**
- * Randomised selection of the k-th smallest element (k is 0-based).
- *
- * <p>It reuses the very same {@link Partition#threeWay} routine as {@link QuickSort}. The only
- * difference is what happens after the partition: QuickSort recurses into <em>both</em> sides,
- * QuickSelect keeps only the one side that can still contain position k, and if k has landed
- * inside the equal-to-pivot block the answer is already known.</p>
- *
- * <p>Because there is a single recursive call and it is in tail position, it is written as a
- * {@code while} loop: the stack depth is Θ(1) no matter how unlucky the pivots are, so a bad
- * pivot sequence costs time but can never cause a {@code StackOverflowError}.</p>
- *
- * <p>Recurrence with a balanced split: T(n) = T(n/2) + Θ(n). Here a = 1, b = 2,
- * f(n) = Θ(n) and n^(log_b a) = n^0 = 1, so f(n) dominates — Master Theorem case 3 —
- * and T(n) = Θ(n). Expected cost with a random pivot is 2n + o(n) comparisons;
- * the worst case is Θ(n²).</p>
- *
- * <p><b>The array is reordered in place</b> (that is what makes it linear and allocation-free).
- * Callers that need the original order should pass a clone.</p>
- */
 public final class QuickSelect {
-
     private QuickSelect() {
     }
 
@@ -43,7 +22,6 @@ public final class QuickSelect {
         int lo = 0;
         int hi = a.length - 1;
         while (true) {
-            // One "logical recursion level" per partition round; the stack itself stays flat.
             metrics.enterRecursion();
             try {
                 if (lo == hi) {
@@ -54,11 +32,11 @@ public final class QuickSelect {
                 int gt = Partition.gt(bounds);
 
                 if (k < lt) {
-                    hi = lt - 1;          // keep only the "< pivot" side
+                    hi = lt - 1;
                 } else if (k > gt) {
-                    lo = gt + 1;          // keep only the "> pivot" side
+                    lo = gt + 1;
                 } else {
-                    return a[k];          // k fell inside the "== pivot" block: done
+                    return a[k];
                 }
             } finally {
                 metrics.exitRecursion();
@@ -66,7 +44,6 @@ public final class QuickSelect {
         }
     }
 
-    /** Convenience wrapper that leaves the caller's array untouched. */
     public static int selectOnCopy(int[] a, int k, long seed, Metrics metrics) {
         validate(a, k);
         return select(a.clone(), k, new Random(seed), metrics);

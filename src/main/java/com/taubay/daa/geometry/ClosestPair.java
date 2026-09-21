@@ -5,41 +5,15 @@ import com.taubay.daa.metrics.Metrics;
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * Closest pair of points in the plane by divide and conquer, Θ(n log n) (bonus task B).
- *
- * <p>Outline:</p>
- * <ol>
- *   <li>Sort the points by x once, up front — Θ(n log n).</li>
- *   <li>Split at the middle x, solve both halves recursively and take δ = min(δ_left, δ_right).</li>
- *   <li>Merge the two halves <em>by y</em> on the way back up. Doing the y-ordering inside the
- *       merge step costs Θ(n) per level instead of re-sorting the strip at every level, which is
- *       what keeps the total at Θ(n log n) rather than Θ(n log² n).</li>
- *   <li>Scan the vertical strip of half-width δ around the split line in y order. For each point
- *       only the next 7 points can possibly be closer than δ — a δ×2δ rectangle cannot hold more
- *       than 8 points that are pairwise ≥ δ apart — so the strip scan is Θ(n).</li>
- * </ol>
- *
- * <p>Recurrence: T(n) = 2·T(n/2) + Θ(n) → Master Theorem case 2 → Θ(n log n), the same shape as
- * MergeSort.</p>
- *
- * <p>Both working arrays (merge buffer and strip) are allocated once in the entry point and
- * threaded through the recursion, so the recursion itself allocates nothing.</p>
- */
 public final class ClosestPair {
-
-    /** Ranges of this size or smaller are solved by brute force. */
     private static final int BRUTE_FORCE_CUTOFF = 3;
 
-    /** How many following points in y order can possibly be closer than the current δ. */
     private static final int STRIP_NEIGHBOURS = 7;
 
     private ClosestPair() {
     }
 
-    /** The closest pair found, together with its distance. */
     public record Result(Point first, Point second, double distance) {
-
         static final Result NONE = new Result(null, null, Double.POSITIVE_INFINITY);
 
         Result best(Result other) {
@@ -52,7 +26,6 @@ public final class ClosestPair {
         }
     }
 
-    /** Θ(n log n) divide-and-conquer solution. The input array is not modified. */
     public static Result closestPair(Point[] points, Metrics metrics) {
         validate(points);
         Point[] byX = points.clone();
@@ -65,7 +38,6 @@ public final class ClosestPair {
         return solve(byX, buffer, strip, 0, byX.length - 1, metrics);
     }
 
-    /** Θ(n²) reference implementation used to validate the fast one in the tests. */
     public static Result bruteForce(Point[] points, Metrics metrics) {
         validate(points);
         Result best = Result.NONE;
@@ -77,10 +49,6 @@ public final class ClosestPair {
         return best;
     }
 
-    /**
-     * Solves {@code a[lo..hi]}, which must be sorted by x on entry, and leaves it sorted by y
-     * on exit.
-     */
     private static Result solve(Point[] a, Point[] buffer, Point[] strip, int lo, int hi, Metrics metrics) {
         metrics.enterRecursion();
         try {
@@ -99,7 +67,6 @@ public final class ClosestPair {
 
             mergeByY(a, buffer, lo, mid, hi, metrics);
 
-            // Collect the strip in y order; it inherits the ordering from the merge above.
             int stripSize = 0;
             for (int i = lo; i <= hi; i++) {
                 if (Math.abs(a[i].x() - midX) < best.distance()) {
@@ -110,8 +77,6 @@ public final class ClosestPair {
             for (int i = 0; i < stripSize; i++) {
                 int limit = Math.min(i + STRIP_NEIGHBOURS, stripSize - 1);
                 for (int j = i + 1; j <= limit; j++) {
-                    // Points are y-sorted, so once the vertical gap alone exceeds the best
-                    // distance no later j can help.
                     if (strip[j].y() - strip[i].y() >= best.distance()) {
                         break;
                     }
@@ -134,7 +99,6 @@ public final class ClosestPair {
         return best;
     }
 
-    /** Merges the y-sorted ranges {@code a[lo..mid]} and {@code a[mid+1..hi]} in Θ(n). */
     private static void mergeByY(Point[] a, Point[] buffer, int lo, int mid, int hi, Metrics metrics) {
         System.arraycopy(a, lo, buffer, lo, hi - lo + 1);
         metrics.addSwaps(hi - lo + 1);
@@ -157,7 +121,6 @@ public final class ClosestPair {
         }
     }
 
-    /** Insertion sort by y for the tiny base-case ranges. */
     private static void sortRangeByY(Point[] a, int lo, int hi, Metrics metrics) {
         for (int i = lo + 1; i <= hi; i++) {
             Point key = a[i];

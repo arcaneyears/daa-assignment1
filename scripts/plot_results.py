@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-"""
-Turns results.csv into the three required plots (time, depth, ratio) plus two
-bonus plots, and writes the numeric Theta-check table used in REPORT.md.
-
-Usage:  python3 scripts/plot_results.py [results.csv] [output_dir]
-"""
 import csv
 import math
 import sys
@@ -25,9 +18,6 @@ INK = "#0b0b0b"
 INK_2 = "#52514e"
 GRID = "#dedcd6"
 
-# Colour follows the algorithm (the entity), never its rank in a panel.
-# Validated as a 5-slot categorical set on the light surface
-# (adjacent CVD dE 9.2, normal-vision dE 27.6) with markers as secondary encoding.
 STYLE = {
     "mergesort":           ("#2a78d6", "o", "MergeSort"),
     "quicksort":           ("#eb6834", "s", "QuickSort"),
@@ -70,12 +60,11 @@ with CSV.open() as fh:
             "max_depth": int(r["max_depth"]),
         })
 
-series = defaultdict(list)          # (algorithm, input) -> [(n, row), ...]
+series = defaultdict(list)
 for r in rows:
     series[(r["algorithm"], r["input"])].append(r)
 for key in series:
     series[key].sort(key=lambda r: r["n"])
-
 
 def line(ax, algo, inp, ykey, transform=None):
     data = series.get((algo, inp), [])
@@ -87,14 +76,12 @@ def line(ax, algo, inp, ykey, transform=None):
     ax.plot(xs, ys, color=colour, marker=marker, markersize=5.5, linewidth=2,
             label=label, markeredgecolor=SURFACE, markeredgewidth=0.8)
 
-
 def human(n, _pos=None):
     if n >= 1_000_000:
         return f"{n / 1_000_000:g}M"
     if n >= 1_000:
         return f"{n / 1_000:g}K"
     return f"{n:g}"
-
 
 def decorate(ax, title, xlabel="n (array size)", ylabel="", ticks=(1_000, 10_000, 100_000, 1_000_000)):
     ax.set_title(title, color=INK, pad=8)
@@ -108,14 +95,11 @@ def decorate(ax, title, xlabel="n (array size)", ylabel="", ticks=(1_000, 10_000
     for spine in ("top", "right"):
         ax.spines[spine].set_visible(False)
 
-
 def legend(ax, **kw):
     kw.setdefault("loc", "best")
     ax.legend(fontsize=8, frameon=True, facecolor=SURFACE, edgecolor="none",
               framealpha=0.92, **kw)
 
-
-# ---------------------------------------------------------------- 1. time vs n
 fig, axes = plt.subplots(1, 4, figsize=(15, 4.0), sharey=True)
 for ax, inp in zip(axes, INPUTS):
     for algo in SORTS + SELECTS:
@@ -129,7 +113,6 @@ fig.tight_layout(rect=(0, 0, 1, 0.94))
 fig.savefig(OUT / "time_vs_n.png", dpi=160)
 plt.close(fig)
 
-# --------------------------------------------------------------- 2. depth vs n
 fig, axes = plt.subplots(1, 4, figsize=(15, 4.0), sharey=True)
 for ax, inp in zip(axes, INPUTS):
     for algo in ["mergesort", "quicksort", "quickselect", "deterministicselect"]:
@@ -146,7 +129,6 @@ fig.tight_layout(rect=(0, 0, 1, 0.94))
 fig.savefig(OUT / "depth_vs_n.png", dpi=160)
 plt.close(fig)
 
-# --------------------------------------------------------------- 3. ratio vs n
 fig, axes = plt.subplots(2, 4, figsize=(15, 7.4))
 for col, inp in enumerate(INPUTS):
     ax = axes[0][col]
@@ -169,7 +151,6 @@ fig.tight_layout(rect=(0, 0, 1, 0.95))
 fig.savefig(OUT / "ratio_vs_n.png", dpi=160)
 plt.close(fig)
 
-# ------------------------------------------------- 4. bonus A: select comparison
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
 for inp, dash in (("random", "-"), ("sorted", "--")):
     for algo in SELECTS:
@@ -192,7 +173,6 @@ fig.tight_layout(rect=(0, 0, 1, 0.93))
 fig.savefig(OUT / "select_quick_vs_deterministic.png", dpi=160)
 plt.close(fig)
 
-# --------------------------------------------------- 5. bonus B: closest pair
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
 for algo in ["closestpair", "closestpair_bruteforce"]:
     line(axes[0], algo, "random", "time_ms")
@@ -213,14 +193,12 @@ fig.tight_layout(rect=(0, 0, 1, 0.93))
 fig.savefig(OUT / "closest_pair.png", dpi=160)
 plt.close(fig)
 
-# ------------------------------------------------------- Theta-check numbers
 def envelope(algo, inp, growth, n0=10_000):
     data = [d for d in series.get((algo, inp), []) if d["n"] >= n0]
     if not data:
         return None
     ratios = [d["comparisons"] / growth(d["n"]) for d in data]
     return min(ratios), max(ratios), max(ratios) / min(ratios)
-
 
 lines = ["# Theta check — empirical constants", "",
          "Ratio f(n)/g(n) over the measured sizes; c1 and c2 are the smallest and largest",

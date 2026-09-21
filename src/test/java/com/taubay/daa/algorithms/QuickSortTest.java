@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuickSortTest {
-
     private static final long SEED = 20260920L;
 
     @Test
@@ -90,7 +89,7 @@ class QuickSortTest {
     @DisplayName("recursion depth on a sorted array of 100 000 stays below 2*log2(n)")
     void depthStaysBoundedOnSortedInput() {
         int n = 100_000;
-        double bound = 2.0 * (Math.log(n) / Math.log(2));  // ~33.2
+        double bound = 2.0 * (Math.log(n) / Math.log(2));
 
         for (int trial = 0; trial < 20; trial++) {
             Metrics metrics = new Metrics();

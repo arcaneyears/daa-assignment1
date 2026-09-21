@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MetricsTest {
-
     @Test
     @DisplayName("comparison helpers return the right answer and count exactly once each")
     void comparisonHelpersCount() {
@@ -34,7 +33,7 @@ class MetricsTest {
         assertEquals(3, m.currentDepth());
         m.exitRecursion();
         m.exitRecursion();
-        m.enterRecursion();     // back down to 2, peak stays 3
+        m.enterRecursion();
         m.exitRecursion();
         m.exitRecursion();
 

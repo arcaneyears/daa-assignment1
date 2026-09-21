@@ -19,26 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-/**
- * Runs every algorithm on every input shape and size, five times each, and writes the median
- * run to {@code results.csv}.
- *
- * <p>Measurement rules:</p>
- * <ul>
- *   <li>A warm-up phase runs every algorithm on medium-sized inputs before anything is
- *       recorded, so the JIT has compiled the hot loops by the time the timer starts.</li>
- *   <li>Input generation and array cloning happen <b>outside</b> the timed region.</li>
- *   <li>Each case is repeated {@value #REPEATS} times; the row written to the CSV is the run
- *       with the <b>median wall-clock time</b>, together with the counters of that same run,
- *       so time, comparisons and depth always describe one single consistent execution.</li>
- *   <li>Insertion sort is only measured up to {@value #INSERTION_SORT_LIMIT} elements — it is
- *       the quadratic baseline and a million elements would take hours.</li>
- * </ul>
- *
- * <p>Usage: {@code mvn -q exec:java} or {@code java -jar target/daa-assignment1-1.0.jar [out.csv]}</p>
- */
 public final class BenchmarkRunner {
-
     private static final int REPEATS = 5;
     private static final int INSERTION_SORT_LIMIT = 10_000;
     private static final int[] SIZES = {1_000, 10_000, 100_000, 1_000_000};
@@ -47,13 +28,11 @@ public final class BenchmarkRunner {
     };
     private static final long SEED = 20260920L;
 
-    /** One measured run: median time plus the counters of that very run. */
     private record Row(String algorithm, String input, int n, double timeMs,
                        long comparisons, int maxDepth, long swaps,
                        long allocations, long recursiveCalls) {
     }
 
-    /** A single measurable execution: it prepares nothing, it just runs and reports. */
     private interface Case {
         void run(Metrics metrics);
     }
@@ -99,8 +78,6 @@ public final class BenchmarkRunner {
         System.out.println("wrote extended metrics to " + extended.toAbsolutePath());
     }
 
-    // ------------------------------------------------------------------ cases
-
     private static List<Row> sortingBenchmarks() {
         List<Row> rows = new ArrayList<>();
         for (InputType input : INPUTS) {
@@ -130,7 +107,7 @@ public final class BenchmarkRunner {
         for (InputType input : INPUTS) {
             for (int n : SIZES) {
                 int[] template = ArrayUtils.generate(input, n, new Random(SEED + n));
-                int k = n / 2;   // the median is the hardest case for selection
+                int k = n / 2;
 
                 rows.add(measure("quickselect", input.label(), n,
                         () -> template.clone(),
@@ -151,7 +128,7 @@ public final class BenchmarkRunner {
             rows.add(measureGeneric("closestpair", "random", n,
                     metrics -> ClosestPair.closestPair(template, metrics)));
         }
-        // The quadratic reference, small sizes only, to show the gap.
+
         for (int n : new int[]{1_000, 2_000}) {
             Point[] template = randomPoints(n, new Random(SEED + n));
             rows.add(measureGeneric("closestpair_bruteforce", "random", n,
@@ -168,8 +145,6 @@ public final class BenchmarkRunner {
         return pts;
     }
 
-    // -------------------------------------------------------------- machinery
-
     private interface ArraySupplier {
         int[] get();
     }
@@ -178,12 +153,11 @@ public final class BenchmarkRunner {
         void apply(int[] data, Metrics metrics);
     }
 
-    /** Measures an int[] algorithm: the array is rebuilt outside the timer before every run. */
     private static Row measure(String algorithm, String input, int n,
                                ArraySupplier supplier, ArrayAlgorithm algo) {
         List<Metrics> runs = new ArrayList<>(REPEATS);
         for (int i = 0; i < REPEATS; i++) {
-            int[] data = supplier.get();      // not timed
+            int[] data = supplier.get();
             Metrics metrics = new Metrics();
             metrics.startTimer();
             algo.apply(data, metrics);
@@ -193,7 +167,6 @@ public final class BenchmarkRunner {
         return medianRow(algorithm, input, n, runs);
     }
 
-    /** Measures anything that only needs a Metrics object. */
     private static Row measureGeneric(String algorithm, String input, int n, Case body) {
         List<Metrics> runs = new ArrayList<>(REPEATS);
         for (int i = 0; i < REPEATS; i++) {
@@ -216,10 +189,6 @@ public final class BenchmarkRunner {
         return row;
     }
 
-    /**
-     * Gives the JIT something to compile before the first measurement, so that the numbers in
-     * the CSV are steady-state numbers instead of interpreter numbers.
-     */
     private static void warmUp() {
         System.out.print("warming up the JVM");
         Random rnd = new Random(SEED);

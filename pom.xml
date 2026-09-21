@@ -50,7 +50,6 @@
         </configuration>
       </plugin>
 
-      <!-- Makes the produced jar directly runnable: java -jar target/daa-assignment1-1.0.jar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -64,7 +63,6 @@
         </configuration>
       </plugin>
 
-      <!-- One command benchmark: mvn -q exec:java -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>

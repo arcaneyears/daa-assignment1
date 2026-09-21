@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DeterministicSelectTest {
-
     private static final long SEED = 20260920L;
 
     @Test

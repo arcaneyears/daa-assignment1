@@ -7,9 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-/** Minimal CSV sink — no dependencies, deterministic formatting, US locale for decimals. */
 public final class CsvWriter implements AutoCloseable {
-
     private final BufferedWriter writer;
 
     public CsvWriter(Path path, List<String> header) throws IOException {

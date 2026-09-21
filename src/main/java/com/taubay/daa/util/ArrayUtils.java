@@ -2,21 +2,17 @@ package com.taubay.daa.util;
 
 import java.util.Random;
 
-/** Array generators and small helpers shared by the benchmark and the tests. */
 public final class ArrayUtils {
-
     private ArrayUtils() {
     }
 
-    /** Input distributions used by the benchmark. */
     public enum InputType {
-        /** Uniformly random ints over the whole int range. */
         RANDOM("random"),
-        /** Already sorted ascending — the classic QuickSort worst case for a fixed pivot. */
+
         SORTED("sorted"),
-        /** Sorted descending. */
+
         REVERSED("reversed"),
-        /** Random values from 0..9, so almost every element has many equal siblings. */
+
         DUPLICATES("duplicates");
 
         private final String label;
@@ -71,7 +67,6 @@ public final class ArrayUtils {
         return a;
     }
 
-    /** Random values in 0..9 — stresses the 3-way partition. */
     public static int[] duplicatesArray(int n, Random rnd) {
         return randomArray(n, 10, rnd);
     }

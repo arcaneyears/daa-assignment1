@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClosestPairTest {
-
     private static final long SEED = 20260920L;
     private static final double EPS = 1e-9;
 
@@ -55,28 +54,24 @@ class ClosestPairTest {
     @Test
     @DisplayName("handles clustered points, duplicates and collinear points")
     void degenerateConfigurations() {
-        // Two identical points anywhere in the set means distance 0.
         Point[] withDuplicate = {
                 new Point(0, 0), new Point(5, 5), new Point(100, 3),
                 new Point(5, 5), new Point(-7, 12)
         };
         assertEquals(0.0, ClosestPair.closestPair(withDuplicate, new Metrics()).distance(), EPS);
 
-        // All points on one vertical line.
         Point[] vertical = new Point[500];
         for (int i = 0; i < vertical.length; i++) {
             vertical[i] = new Point(3.0, i * 2.0);
         }
         assertEquals(2.0, ClosestPair.closestPair(vertical, new Metrics()).distance(), EPS);
 
-        // All points on one horizontal line.
         Point[] horizontal = new Point[500];
         for (int i = 0; i < horizontal.length; i++) {
             horizontal[i] = new Point(i * 0.5, -4.0);
         }
         assertEquals(0.5, ClosestPair.closestPair(horizontal, new Metrics()).distance(), EPS);
 
-        // Points sharing the same x in a grid, which stresses the strip scan.
         Random rnd = new Random(SEED + 2);
         Point[] grid = new Point[1_000];
         for (int i = 0; i < grid.length; i++) {

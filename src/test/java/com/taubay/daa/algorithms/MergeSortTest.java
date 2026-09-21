@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MergeSortTest {
-
     private static final long SEED = 20260920L;
 
     @Test
@@ -98,7 +97,7 @@ class MergeSortTest {
             assertEquals(1, metrics.allocations(), "more than one buffer allocated for n=" + n);
             assertEquals(n, metrics.allocatedCells(), "buffer has the wrong size for n=" + n);
         }
-        // Trivial inputs need no buffer at all.
+
         Metrics trivial = new Metrics();
         MergeSort.sort(new int[]{1}, trivial);
         assertEquals(0, trivial.allocations());
