@@ -19,14 +19,11 @@ public final class QuickSelect {
     public static int select(int[] a, int k, Random rnd, Metrics metrics) {
         validate(a, k);
 
-        int lo = 0;
-        int hi = a.length - 1;
-        while (true) {
-            metrics.enterRecursion();
-            try {
-                if (lo == hi) {
-                    return a[lo];
-                }
+        metrics.enterRecursion();
+        try {
+            int lo = 0;
+            int hi = a.length - 1;
+            while (lo < hi) {
                 long bounds = Partition.threeWayRandom(a, lo, hi, rnd, metrics);
                 int lt = Partition.lt(bounds);
                 int gt = Partition.gt(bounds);
@@ -38,9 +35,10 @@ public final class QuickSelect {
                 } else {
                     return a[k];
                 }
-            } finally {
-                metrics.exitRecursion();
             }
+            return a[k];
+        } finally {
+            metrics.exitRecursion();
         }
     }
 

@@ -24,10 +24,6 @@ public final class CsvWriter implements AutoCloseable {
         writer.newLine();
     }
 
-    public void flush() throws IOException {
-        writer.flush();
-    }
-
     @Override
     public void close() throws IOException {
         writer.close();

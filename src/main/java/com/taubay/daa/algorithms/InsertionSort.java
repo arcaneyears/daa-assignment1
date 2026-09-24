@@ -20,7 +20,6 @@ public final class InsertionSort {
 
             while (j >= lo && metrics.greater(a[j], key)) {
                 a[j + 1] = a[j];
-                metrics.addSwaps(1);
                 j--;
             }
             a[j + 1] = key;

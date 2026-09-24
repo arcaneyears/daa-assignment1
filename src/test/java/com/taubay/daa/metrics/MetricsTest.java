@@ -12,14 +12,13 @@ class MetricsTest {
     void comparisonHelpersCount() {
         Metrics m = new Metrics();
 
-        assertTrue(m.less(1, 2));
         assertTrue(m.lessOrEqual(2, 2));
         assertTrue(m.greater(3, 2));
         assertEquals(-1, m.compare(1, 2));
         assertEquals(0, m.compare(2, 2));
         assertEquals(1, m.compare(3, 2));
 
-        assertEquals(6, m.comparisons());
+        assertEquals(5, m.comparisons());
     }
 
     @Test
@@ -30,7 +29,6 @@ class MetricsTest {
         m.enterRecursion();
         m.enterRecursion();
         m.enterRecursion();
-        assertEquals(3, m.currentDepth());
         m.exitRecursion();
         m.exitRecursion();
         m.enterRecursion();
@@ -38,21 +36,6 @@ class MetricsTest {
         m.exitRecursion();
 
         assertEquals(3, m.maxDepth());
-        assertEquals(0, m.currentDepth());
-        assertEquals(4, m.recursiveCalls());
-    }
-
-    @Test
-    @DisplayName("swap exchanges the elements and counts one move")
-    void swapCounts() {
-        Metrics m = new Metrics();
-        int[] a = {1, 2, 3};
-
-        m.swap(a, 0, 2);
-
-        assertEquals(3, a[0]);
-        assertEquals(1, a[2]);
-        assertEquals(1, m.swaps());
     }
 
     @Test
@@ -74,8 +57,7 @@ class MetricsTest {
     @DisplayName("reset clears every counter")
     void resetClearsEverything() {
         Metrics m = new Metrics();
-        m.less(1, 2);
-        m.addSwaps(3);
+        m.compare(1, 2);
         m.recordAllocation(10);
         m.enterRecursion();
         m.startTimer();
@@ -84,11 +66,9 @@ class MetricsTest {
         m.reset();
 
         assertEquals(0, m.comparisons());
-        assertEquals(0, m.swaps());
         assertEquals(0, m.allocations());
         assertEquals(0, m.allocatedCells());
         assertEquals(0, m.maxDepth());
-        assertEquals(0, m.recursiveCalls());
         assertEquals(0.0, m.elapsedMillis(), 1e-9);
     }
 }

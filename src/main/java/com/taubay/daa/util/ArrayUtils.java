@@ -11,8 +11,6 @@ public final class ArrayUtils {
 
         SORTED("sorted"),
 
-        REVERSED("reversed"),
-
         DUPLICATES("duplicates");
 
         private final String label;
@@ -30,7 +28,6 @@ public final class ArrayUtils {
         return switch (type) {
             case RANDOM -> randomArray(n, rnd);
             case SORTED -> sortedArray(n);
-            case REVERSED -> reversedArray(n);
             case DUPLICATES -> duplicatesArray(n, rnd);
         };
     }
@@ -59,14 +56,6 @@ public final class ArrayUtils {
         return a;
     }
 
-    public static int[] reversedArray(int n) {
-        int[] a = new int[n];
-        for (int i = 0; i < n; i++) {
-            a[i] = n - i;
-        }
-        return a;
-    }
-
     public static int[] duplicatesArray(int n, Random rnd) {
         return randomArray(n, 10, rnd);
     }
@@ -78,11 +67,5 @@ public final class ArrayUtils {
             }
         }
         return true;
-    }
-
-    public static void swap(int[] a, int i, int j) {
-        int tmp = a[i];
-        a[i] = a[j];
-        a[j] = tmp;
     }
 }

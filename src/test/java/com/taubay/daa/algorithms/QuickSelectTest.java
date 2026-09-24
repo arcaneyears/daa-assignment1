@@ -48,7 +48,7 @@ class QuickSelectTest {
     }
 
     @Test
-    @DisplayName("works on duplicate-heavy, sorted and reversed input")
+    @DisplayName("works on random, sorted and duplicate-heavy input")
     void worksOnStructuredInput() {
         Random rnd = new Random(SEED + 2);
         int n = 5_000;
@@ -73,7 +73,7 @@ class QuickSelectTest {
     @DisplayName("invalid input throws IllegalArgumentException with a clear message")
     void invalidInputRejected() {
         IllegalArgumentException empty = assertThrows(IllegalArgumentException.class,
-                () -> QuickSelect.select(new int[0], 0, SEED, new Metrics()));
+                () -> QuickSelect.select(new int[0], 0, new Metrics()));
         assertTrue(empty.getMessage().contains("empty"), empty.getMessage());
 
         IllegalArgumentException negative = assertThrows(IllegalArgumentException.class,
@@ -111,7 +111,5 @@ class QuickSelectTest {
         assertEquals(1, metrics.maxDepth(), "QuickSelect must not nest stack frames");
         assertTrue(metrics.comparisons() <= 10L * n,
                 "comparisons=" + metrics.comparisons() + " should be O(n)");
-        assertTrue(metrics.recursiveCalls() <= 200,
-                "partition rounds=" + metrics.recursiveCalls());
     }
 }

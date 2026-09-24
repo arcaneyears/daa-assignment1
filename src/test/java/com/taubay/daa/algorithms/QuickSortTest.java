@@ -72,7 +72,10 @@ class QuickSortTest {
         QuickSort.sort(sorted, SEED, new Metrics());
         assertArrayEquals(ArrayUtils.sortedArray(10_000), sorted);
 
-        int[] reversed = ArrayUtils.reversedArray(10_000);
+        int[] reversed = new int[10_000];
+        for (int i = 0; i < reversed.length; i++) {
+            reversed[i] = reversed.length - i;
+        }
         int[] expectedReversed = reversed.clone();
         Arrays.sort(expectedReversed);
         QuickSort.sort(reversed, SEED, new Metrics());
@@ -101,7 +104,7 @@ class QuickSortTest {
     }
 
     @Test
-    @DisplayName("recursion depth stays bounded on random, reversed and duplicate input too")
+    @DisplayName("recursion depth stays bounded on random and duplicate input too")
     void depthStaysBoundedOnEveryInputShape() {
         int n = 100_000;
         double bound = 2.0 * (Math.log(n) / Math.log(2));
